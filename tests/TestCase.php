@@ -3,6 +3,7 @@
 namespace ClarkeWing\Handoff\Tests;
 
 use ClarkeWing\Handoff\HandoffServiceProvider;
+use ClarkeWing\Handoff\Tests\Fixtures\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Orchestra\Testbench\TestCase as Orchestra;
@@ -34,10 +35,19 @@ abstract class TestCase extends Orchestra
             'database' => ':memory:',
             'prefix' => '',
         ]);
+
+        $app['config']->set('handoff.auth.model', User::class);
     }
 
     protected function setUpDatabase($app): void
     {
         $schema = $app['db']->connection()->getSchemaBuilder();
+
+        $schema->create('users', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('email');
+        });
+
+        $this->testUser = User::create(['email' => 'test@user.com']);
     }
 }
