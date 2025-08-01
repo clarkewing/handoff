@@ -6,6 +6,8 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+use Stringable;
 
 class HandoffServiceProvider extends ServiceProvider
 {
@@ -21,6 +23,8 @@ class HandoffServiceProvider extends ServiceProvider
         $this->bootPackageRoutes();
 
         $this->publishPackageConfig();
+
+        $this->bootPackageMacros();
     }
 
     protected function configurePackageRateLimiting(): void
@@ -47,5 +51,19 @@ class HandoffServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../config/handoff.php' => config_path('handoff.php'),
         ], 'handoff-config');
+    }
+
+    protected function bootPackageMacros(): void
+    {
+
+        if ($this->laravelVersion() < 9) {
+            Request::macro('string', function ($key, $default = null): Stringable {
+                return Str::of($this->input($key, $default));
+            });
+        }
+
+    protected function laravelVersion(): int
+    {
+        return (int) Str::before(app()->version(), '.');
     }
 }
