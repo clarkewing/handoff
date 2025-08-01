@@ -4,8 +4,8 @@ namespace ClarkeWing\Handoff\Actions;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\URL;
-use Spatie\Url\Url as Uri;
 use RuntimeException;
+use Spatie\Url\Url as Uri;
 
 /**
  * Generates a signed handoff URL to authenticate a user on another app
