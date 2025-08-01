@@ -4,7 +4,7 @@ namespace ClarkeWing\Handoff\Actions;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Uri;
+use Spatie\Url\Url as Uri;
 use RuntimeException;
 
 /**
@@ -23,7 +23,7 @@ class GenerateHandoffUrl
 
         $signedUrl = URL::temporarySignedRoute(
             'handoff',
-            now()->addSeconds($ttl ?? config()->integer('handoff.auth.ttl', 300)),
+            now()->addSeconds($ttl ?? config('handoff.auth.ttl', 300)),
             [
                 'user' => $this->getUserKey($user),
                 'target' => $targetPath,
@@ -54,19 +54,14 @@ class GenerateHandoffUrl
      */
     protected function swapBaseUrl(string $signedUrl): string
     {
-        $targetHost = Uri::of(config()->string('handoff.target_host'));
+        $targetHost = Uri::fromString(config('handoff.target_host'));
 
-        $host = $targetHost->host();
-        $scheme = $targetHost->scheme();
+        $host = $targetHost->getHost();
+        $scheme = $targetHost->getScheme();
 
-        if ($host === null || $scheme === null) {
-            throw new \RuntimeException('Invalid handoff.target_host config: must include scheme and host');
-        }
-
-        return Uri::to($signedUrl)
+        return (string) Uri::fromString($signedUrl)
             ->withHost($host)
-            ->withScheme($scheme)
-            ->value();
+            ->withScheme($scheme);
     }
 
     /**
