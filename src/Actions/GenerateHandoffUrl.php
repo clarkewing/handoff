@@ -21,9 +21,12 @@ class GenerateHandoffUrl
 
         $targetPath = $toPath ?? $this->resolveMappedRoute($fromRoute);
 
+        /** @var int $configTtl */
+        $configTtl = config('handoff.auth.ttl', 300);
+
         $signedUrl = URL::temporarySignedRoute(
             'handoff',
-            now()->addSeconds($ttl ?? config('handoff.auth.ttl', 300)),
+            now()->addSeconds($ttl ?? $configTtl),
             [
                 'user' => $this->getUserKey($user),
                 'target' => $targetPath,
@@ -54,7 +57,9 @@ class GenerateHandoffUrl
      */
     protected function swapBaseUrl(string $signedUrl): string
     {
-        $targetHost = Uri::fromString(config('handoff.target_host'));
+        /** @var string $targetHost */
+        $targetHost = config('handoff.target_host');
+        $targetHost = Uri::fromString($targetHost);
 
         $host = $targetHost->getHost();
         $scheme = $targetHost->getScheme();

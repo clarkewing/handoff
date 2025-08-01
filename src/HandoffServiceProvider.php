@@ -57,7 +57,7 @@ class HandoffServiceProvider extends ServiceProvider
     {
         if ($this->laravelVersion() < 9) {
             Request::macro('string', function (?string $key, mixed $default = null): Stringable {
-                return Str::of($this->input($key, $default));
+                return Str::of($this->input($key, $default)); /** @phpstan-ignore argument.type */
             });
         }
     }

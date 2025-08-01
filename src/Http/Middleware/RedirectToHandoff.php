@@ -41,6 +41,9 @@ class RedirectToHandoff
 
     protected function isHandoffRoute(string $routeName): bool
     {
-        return array_key_exists($routeName, config('handoff.routes'));
+        /** @var array<string, string> $routeMap */
+        $routeMap = config('handoff.routes');
+
+        return array_key_exists($routeName, $routeMap);
     }
 }
