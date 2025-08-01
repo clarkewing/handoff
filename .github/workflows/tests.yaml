@@ -53,6 +53,11 @@ jobs:
           echo "::add-matcher::${{ runner.tool_cache }}/php.json"
           echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
+      - name: Remove unnecessary dev dependencies
+        run: |
+          composer remove --dev laravel/pint pestphp/pest-plugin-type-coverage phpstan/phpstan --no-update
+
+
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
