@@ -10,7 +10,8 @@ expect()->extend('toHaveQueryParam', function (string $key, mixed $expected = nu
     expect($actual = getQueryParamValue($url, $key))
         ->not->toThrow(
             InvalidArgumentException::class,
-            message: "Expected URL to contain query parameter '{$key}', but it was missing.",
+            null,
+            "Expected URL to contain query parameter '{$key}', but it was missing.",
         );
 
     // If no value was provided, we're just checking existence.
