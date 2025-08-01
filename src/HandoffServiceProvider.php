@@ -55,12 +55,12 @@ class HandoffServiceProvider extends ServiceProvider
 
     protected function bootPackageMacros(): void
     {
-
         if ($this->laravelVersion() < 9) {
             Request::macro('string', function ($key, $default = null): Stringable {
                 return Str::of($this->input($key, $default));
             });
         }
+    }
 
     protected function laravelVersion(): int
     {
