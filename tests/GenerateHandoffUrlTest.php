@@ -58,9 +58,6 @@ it('uses a custom user identifier when provided', function () {
     $userWithEmailIdentifier = UserWithCustomIdentifier::create(['email' => 'custom@example.com']);
     $handoffIdentifierName = $userWithEmailIdentifier->getHandoffIdentifierName();
 
-    //    expect($this->action->generate($userWithEmailIdentifier, toPath: '/some/path'))
-    //        ->toHaveQueryParam('user', urlencode($userWithEmailIdentifier->{$handoffIdentifierName}));
-
     expect($this->action->generate($userWithEmailIdentifier, toPath: '/some/path'))
         ->toHaveQueryParam('user', $userWithEmailIdentifier->{$handoffIdentifierName});
 });
