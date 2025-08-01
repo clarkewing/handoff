@@ -21,7 +21,7 @@ it('generates a signed URL with a target path', function () {
 
     expect($url)
         ->toStartWith('https://remote.app/handoff')
-        ->toHaveQueryParam('user', dump($this->testUser->getAuthIdentifier()))
+        ->toHaveQueryParam('user', $this->testUser->getAuthIdentifier())
         ->toHaveQueryParam('target', '/some/path')
         ->toHaveQueryParam('signature')
         ->toHaveQueryParam('expires');

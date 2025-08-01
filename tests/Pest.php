@@ -14,12 +14,12 @@ expect()->extend('toHaveQueryParam', function (string $key, mixed $expected = nu
             "Expected URL to contain query parameter '{$key}', but it was missing.",
         );
 
-    // If no value was provided, we're just checking existence.
-    if (func_num_args() === 1) {
-        return $this;
+    // If an expected value is provided, we assert it matches
+    if (func_num_args() > 1) {
+        expect($expected)->toBe($actual);
     }
 
-    return expect($expected)->toBe($actual);
+    return $this;
 });
 
 function getQueryParamValue(string $url, string $key): string|int|null
