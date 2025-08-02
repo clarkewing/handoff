@@ -5,7 +5,9 @@ on: ['push', 'pull_request']
 jobs:
   test:
     runs-on: ubuntu-latest
+
     timeout-minutes: 5
+
     strategy:
       fail-fast: true
       matrix:
@@ -29,7 +31,7 @@ jobs:
           - php: 8.4
             laravel: 12.*
 
-    name: P${{ matrix.php }} - L${{ matrix.laravel }}
+    name: Laravel ${{ matrix.laravel }} - PHP ${{ matrix.php }}
 
     steps:
       - name: Checkout code

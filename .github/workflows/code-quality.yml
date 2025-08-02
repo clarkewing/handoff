@@ -1,9 +1,9 @@
-name: Formats
+name: Code Quality
 
 on: ['push', 'pull_request']
 
 jobs:
-  ci:
+  code-style:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -13,7 +13,7 @@ jobs:
         php: [8.2]
         dependency-version: [prefer-stable]
 
-    name: Formats P${{ matrix.php }} - ${{ matrix.os }} - ${{ matrix.dependency-version }}
+    name: Code Quality PHP ${{ matrix.php }} - ${{ matrix.os }} - ${{ matrix.dependency-version }}
 
     steps:
 
