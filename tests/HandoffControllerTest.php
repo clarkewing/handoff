@@ -1,5 +1,6 @@
 <?php
 
+use ClarkeWing\Handoff\Actions\GenerateHandoffUrl;
 use ClarkeWing\Handoff\Tests\Fixtures\NonAuthenticatableUser;
 use Illuminate\Support\Facades\URL;
 
@@ -13,6 +14,22 @@ it('rejects invalid signatures', function () {
     $this->get('/handoff?user=1&target=/dashboard&signature=foobar')
         ->assertStatus(403)
         ->assertSee('Invalid or expired Handoff redirect URL');
+});
+
+it('accepts a signed URL generated from another hostname', function () {
+    setUrlRoot('http://foo.com');
+    config()->set('handoff.target_host', 'http://bar.com');
+
+    $url = resolve(GenerateHandoffUrl::class)->generate($this->testUser, toPath: '/dashboard');
+
+    expect($url)->toStartWith('http://bar.com');
+
+    $this->get($url)
+        ->assertRedirect('/dashboard');
+
+    expect(auth())
+        ->check()->toBeTrue()
+        ->id()->toBe($this->testUser->getAuthIdentifier());
 });
 
 it('rejects expired signed URLs', function () {
@@ -145,3 +162,12 @@ it('throws exception when configured user model does not implement Authenticatab
     expect(fn () => $this->get($url))
         ->toThrow(RuntimeException::class, 'Configured user model [ClarkeWing\Handoff\Tests\Fixtures\NonAuthenticatableUser] must implement Authenticatable');
 });
+
+function setUrlRoot(string $root): void
+{
+    if (laravelVersion() < 10) {
+        URL::forceRootUrl($root);
+    } else {
+        URL::useOrigin($root);
+    }
+}
