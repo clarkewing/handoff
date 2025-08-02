@@ -34,6 +34,7 @@ composer require clarkewing/handoff
 ```
 
 In your origin app’s `.env` file, register the target host:
+
 ```bash
 HANDOFF_TARGET_HOST="https://new.example.org"
 ```
@@ -51,6 +52,7 @@ php artisan vendor:publish --tag=handoff-config
 **Note:** This is required if you want to use route mapping (see the Usage section).
 
 These are the contents of the published config file:
+
 ```php
 /*
 |--------------------------------------------------------------------------
@@ -110,6 +112,7 @@ These are the contents of the published config file:
 In the target app, **Handoff** automatically registers a `/handoff` endpoint via its service provider. This endpoint validates the signed URL, logs the user in, and redirects them to the intended destination.
 
 ### Origin app
+
 From the origin app, **Handoff** provides three ways of _handing off_ a request to the target application:
 
 1. [Manually generating a signed Handoff URL](#manually-generating-a-signed-handoff-url)
@@ -144,7 +147,7 @@ To simplify redirecting users, **Handoff** registers its `handoff` middleware. I
 Route::get('/settings/profile', fn () => view('settings.profile'))
    ->middleware('handoff:/account/info')
 ```
-   
+
 #### Automatically redirecting users via the `handoff` middleware while using route mapping
 
 For cases where you’d prefer to centrally manage your handoff origin routes and target paths, **Handoff** provides the possibility to use route to path mapping.
@@ -169,16 +172,19 @@ After publishing **Handoff**’s config file, you can set up route mapping:
 ---
 
 ## 🔐 Security
-This package uses Laravel’s temporarySignedRoute() mechanism. URLs are cryptographically signed and valid only for a limited time. You can customize the TTL or add rate limiting via the included service provider.
+
+This package uses Laravel’s `temporarySignedRoute()` mechanism. URLs are cryptographically signed and valid only for a limited time. You can customize the TTL or add rate limiting via the included service provider.
 
 ---
 
 ## 🤝 Contributing
+
 Issues and PRs welcome! Please see our [Contribution guidelines](CONTRIBUTING.md) if contributing tests or features.
 
 ---
 
 ## 📜 License
+
 Released under the MIT License.
 
 ---
