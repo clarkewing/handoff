@@ -2,8 +2,10 @@
 
 namespace ClarkeWing\Handoff;
 
+use ClarkeWing\Handoff\Http\Middleware\RedirectToHandoff;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -20,7 +22,9 @@ class HandoffServiceProvider extends ServiceProvider
     {
         $this->configurePackageRateLimiting();
 
-        $this->bootPackageRoutes();
+        $this->registerPackageRoutes();
+
+        $this->registerPackageMiddleware();
 
         $this->publishPackageConfig();
 
@@ -34,9 +38,15 @@ class HandoffServiceProvider extends ServiceProvider
         });
     }
 
-    protected function bootPackageRoutes(): void
+    protected function registerPackageRoutes(): void
     {
         $this->loadRoutesFrom(__DIR__.'/../routes/handoff.php');
+    }
+
+    protected function registerPackageMiddleware(): void
+    {
+        $this->app->make(Router::class)
+            ->aliasMiddleware('handoff', RedirectToHandoff::class);
     }
 
     protected function registerPackageConfig(): void
@@ -57,7 +67,8 @@ class HandoffServiceProvider extends ServiceProvider
     {
         if ($this->laravelVersion() < 9) {
             Request::macro('string', function (?string $key, mixed $default = null): Stringable {
-                return Str::of($this->input($key, $default)); /** @phpstan-ignore argument.type */
+                /** @phpstan-ignore argument.type */
+                return Str::of($this->input($key, $default));
             });
         }
     }

@@ -12,6 +12,18 @@ beforeEach(function () {
     config()->set('handoff.auth.ttl', 300);
 });
 
+it('works with a middleware alias', function () {
+    Route::middleware(['handoff:/remote/path'])
+        ->get('/handoff-explicit', fn () => 'should never reach here');
+
+    $response = $this->actingAs($this->testUser)->get('/handoff-explicit');
+
+    $response->assertRedirect();
+    $response->assertDontSee('should never reach here');
+    expect($response->headers->get('Location'))
+        ->toStartWith('https://remote.app/handoff');
+});
+
 it('redirects authenticated user to explicit path', function () {
     Route::middleware([RedirectToHandoff::class.':/remote/path'])
         ->get('/handoff-explicit', fn () => 'should never reach here');
