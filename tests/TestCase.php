@@ -29,6 +29,9 @@ abstract class TestCase extends Orchestra
     protected function getEnvironmentSetUp($app): void
     {
         Model::preventLazyLoading();
+
+        $app['config']->set('app.key', 'base64:XKIF+krFyL/DetvgSFCnmAOUn99navUB2AeeMbDIbcM=');
+
         $app['config']->set('database.default', 'sqlite');
         $app['config']->set('database.connections.sqlite', [
             'driver' => 'sqlite',

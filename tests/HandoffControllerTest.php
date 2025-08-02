@@ -74,13 +74,17 @@ it('returns 404 when user is not found', function () {
 });
 
 it('authenticates the user and redirects to the target path', function () {
+    Route::get('/auth-check', fn () => 'success')->middleware('auth');
+
     $url = generateHandoffUrl(
         user: $this->testUser->getAuthIdentifier(),
-        target: '/dashboard',
+        target: '/auth-check',
     );
 
-    $this->get($url)
-        ->assertRedirect('/dashboard');
+    $this->followingRedirects()
+        ->get($url)
+        ->assertSuccessful()
+        ->assertSee('success');
 
     // Verify the user is authenticated
     expect(auth())
