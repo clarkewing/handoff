@@ -141,7 +141,7 @@ it('throws exception when configured user model does not implement Authenticatab
 
 function setUrlRoot(string $root): void
 {
-    if (laravelVersion() < 10) {
+    if (laravelVersion() < 11) {
         URL::forceRootUrl($root);
     } else {
         URL::useOrigin($root);
