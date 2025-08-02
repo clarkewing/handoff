@@ -174,7 +174,7 @@ This package uses Laravel’s temporarySignedRoute() mechanism. URLs are cryptog
 ---
 
 ## 🤝 Contributing
-Issues and PRs welcome! Please see CONTRIBUTING.md if contributing tests or features.
+Issues and PRs welcome! Please see our [Contribution guidelines](CONTRIBUTING.md) if contributing tests or features.
 
 ---
 
