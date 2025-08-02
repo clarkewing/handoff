@@ -17,7 +17,7 @@ return [
 
         // Lifetime (in seconds) of the signed URL used for authentication.
         // This helps ensure links expire quickly and remain secure.
-        'ttl' => 300,
+        'ttl' => env('HANDOFF_TTL', 300),
     ],
 
     /*
