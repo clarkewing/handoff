@@ -28,7 +28,7 @@ class HandoffController
 
     protected function validateSignedURL(): void
     {
-        if (! URL::hasValidSignature($this->request)) {
+        if (! URL::hasValidSignature($this->request, false)) {
             abort(403, 'Invalid or expired Handoff redirect URL.');
         }
     }

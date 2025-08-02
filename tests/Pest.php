@@ -1,6 +1,7 @@
 <?php
 
 use ClarkeWing\Handoff\Tests\TestCase;
+use Illuminate\Support\Str;
 
 uses(TestCase::class)->in(__DIR__);
 
@@ -35,4 +36,9 @@ function getQueryParamValue(string $url, string $key): string|int|null
     return ($value = $params[$key]) === ''
         ? null
         : (is_numeric($value) ? (int) $value : $value);
+}
+
+function laravelVersion(): int
+{
+    return (int) Str::before(app()->version(), '.');
 }
