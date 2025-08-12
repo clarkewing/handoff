@@ -9,7 +9,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use Stringable;
+use Illuminate\Support\Stringable;
 
 class HandoffServiceProvider extends ServiceProvider
 {
