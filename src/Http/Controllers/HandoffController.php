@@ -54,8 +54,12 @@ class HandoffController
             ? $userModelInstance->getHandoffIdentifierName()
             : $userModelInstance->getAuthIdentifierName();
 
-        // @phpstan-ignore-next-line
-        return $userModel::where($userIdentifierName, $userKey)
+        if (! is_string($userIdentifierName)) {
+            throw new RuntimeException("[$userModel] getHandoffIdentifierName() must return a string.");
+        }
+
+        return $userModelInstance->newQuery()
+            ->where($userIdentifierName, $userKey)
             ->firstOr(fn () => abort(404, 'User not found.'));
     }
 

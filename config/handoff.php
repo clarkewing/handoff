@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -13,7 +15,7 @@ return [
 
     'auth' => [
         // The Authenticable model used in your application.
-        'model' => App\Models\User::class, /** @phpstan-ignore class.notFound */
+        'model' => User::class, /** @phpstan-ignore class.notFound */
 
         // Lifetime (in seconds) of the signed URL used for authentication.
         // This helps ensure links expire quickly and remain secure.
