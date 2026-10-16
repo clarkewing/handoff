@@ -102,6 +102,20 @@ These are the contents of the published config file:
 
 /*
 |--------------------------------------------------------------------------
+| Domain
+|--------------------------------------------------------------------------
+|
+| The host on which this app's /handoff endpoint is served. Leave it null
+| to register the endpoint without a domain constraint, so that it answers
+| on every host the app serves. Set it when the app serves several hosts
+| and the endpoint should only exist on one of them.
+|
+*/
+
+'domain' => env('HANDOFF_DOMAIN'),
+
+/*
+|--------------------------------------------------------------------------
 | Route Mapping
 |--------------------------------------------------------------------------
 |
@@ -125,6 +139,8 @@ These are the contents of the published config file:
 ### Target app
 
 In the target app, **Handoff** automatically registers a `/handoff` endpoint via its service provider. This endpoint validates the signed URL, logs the user in, and redirects them to the intended destination.
+
+The endpoint is registered without a domain constraint, so it answers on every host the app serves. If the app serves several hosts, set `HANDOFF_DOMAIN` (the `domain` config entry) to the one host the endpoint should exist on.
 
 ### Origin app
 

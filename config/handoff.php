@@ -50,6 +50,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Domain
+    |--------------------------------------------------------------------------
+    |
+    | The host on which this app's /handoff endpoint is served. Leave it null
+    | to register the endpoint without a domain constraint, so that it answers
+    | on every host the app serves. Set it when the app serves several hosts
+    | and the endpoint should only exist on one of them.
+    |
+    */
+
+    'domain' => env('HANDOFF_DOMAIN'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Route Mapping
     |--------------------------------------------------------------------------
     |
