@@ -11,6 +11,7 @@
 
 - 🔐 Secure authentication handoff via signed URLs
 - 🔁 Bi-directional route mapping between apps
+- 🚪 Guest flow: log in on one app, land on the page you wanted on the other
 - ⏱️ Expirable links with configurable TTL
 - ⚙️ Fully customizable user model & identifier
 - 🌍 Shared, environment-agnostic logic — install on both apps
@@ -84,6 +85,20 @@ These are the contents of the published config file:
 */
 
 'target_host' => env('HANDOFF_TARGET_HOST', ''),
+
+/*
+|--------------------------------------------------------------------------
+| Login Path
+|--------------------------------------------------------------------------
+|
+| The path of the login page on the target host. Guests of this app can be
+| sent there (see the RedirectGuestToHandoffLogin middleware) carrying the
+| path they were trying to reach, so that the target app can hand them
+| back here once they have authenticated.
+|
+*/
+
+'login_path' => env('HANDOFF_LOGIN_PATH', '/login'),
 
 /*
 |--------------------------------------------------------------------------
@@ -171,9 +186,88 @@ After publishing **Handoff**’s config file, you can set up route mapping:
 
 ---
 
+## 🚪 Guest flow: logging in on the other app
+
+When login lives on only one of the two apps, a guest who hits a protected page on the other app has to be sent across to log in, and then brought back to the page they wanted. **Handoff** covers both legs of that trip without either app depending on the other's auth stack.
+
+```
+Origin app                                   Target app
+──────────                                   ──────────
+GET /members/42 (guest)
+  └─ auth middleware stores url.intended
+     and redirects to /login
+GET /login  [handoff.login]
+  └─ 302 ──────────────────────────────────▶ GET /login?intended=/members/42  [handoff.intended]
+                                               └─ stores "handoff.intended" in the session
+                                             POST /login (user authenticates)
+                                               └─ HandoffIntended::pullUrl($user)
+GET /handoff?user=…&target=/members/42 ◀──────── 302 to the signed handoff URL
+  └─ logs the user in, redirects to /members/42
+```
+
+In the examples below, the *origin* app is the one whose login page is going away and the *target* app is the one that authenticates users. Each app's `HANDOFF_TARGET_HOST` points at the other app, exactly as for the authenticated handoff.
+
+### Origin app: send guests to the target login page
+
+Apply the `handoff.login` middleware (`RedirectGuestToHandoffLogin`) to the origin app's login route. Guests are redirected to `{HANDOFF_TARGET_HOST}{login_path}?intended={path}`, where `path` is the page they were trying to reach, taken from the `url.intended` session entry that Laravel's `auth` middleware stores. Authenticated users pass through untouched.
+
+```php
+Route::get('/login', fn () => view('auth.login'))
+    ->middleware('handoff.login')
+    ->name('login');
+```
+
+The middleware also accepts an explicit path, which takes precedence over the session:
+
+```php
+Route::get('/login', fn () => view('auth.login'))
+    ->middleware('handoff.login:/dashboard');
+```
+
+To build the URL yourself, resolve the `GenerateHandoffLoginUrl` action:
+
+```php
+use ClarkeWing\Handoff\Actions\GenerateHandoffLoginUrl;
+
+// Pulls url.intended from the session and reduces it to a relative path
+$url = resolve(GenerateHandoffLoginUrl::class)->generate();
+
+// Or pass the intended path explicitly
+$url = resolve(GenerateHandoffLoginUrl::class)->generate('/members/42');
+```
+
+Only internal paths are forwarded: anything with a scheme or host, or a protocol-relative form such as `//evil.com`, is dropped and the bare login URL is produced instead. The login page path defaults to `/login` and can be changed through the `login_path` config entry or `HANDOFF_LOGIN_PATH`.
+
+### Target app: remember the intended path and hand the user back
+
+Apply the `handoff.intended` middleware (`RememberHandoffIntended`) to the target app's login route. It validates the `intended` query parameter and stores it in the session under the `handoff.intended` key. Invalid or missing values are ignored, so the middleware is safe to leave on the route permanently.
+
+```php
+Route::get('/login', [LoginController::class, 'create'])
+    ->middleware('handoff.intended');
+```
+
+Once the user has authenticated, consume the stored path from your own post-login response. `HandoffIntended::pullUrl()` returns a signed handoff URL to the origin app for that path, clearing it from the session, or `null` when nothing was stored so you can fall back to your usual redirect:
+
+```php
+use ClarkeWing\Handoff\HandoffIntended;
+
+$handoffUrl = resolve(HandoffIntended::class)->pullUrl($request->user());
+
+return $handoffUrl
+    ? redirect()->away($handoffUrl)
+    : redirect()->intended('/dashboard');
+```
+
+`GenerateHandoffUrl::forIntended($user)` is a shortcut for the same call. `HandoffIntended` also exposes `remember()`, `get()`, `pull()` and `forget()` should you need finer control over the stored path.
+
+---
+
 ## 🔐 Security
 
 This package uses Laravel’s `temporarySignedRoute()` mechanism. URLs are cryptographically signed and valid only for a limited time. You can customize the TTL or add rate limiting via the included service provider.
+
+Every redirect target the package handles (the `target` of a signed handoff URL and the `intended` path of the guest flow) must be an internal path: it has to start with a single `/` and may not carry a scheme or host. Anything else is replaced with `/` or dropped, which prevents open redirects.
 
 ---
 

@@ -2,7 +2,9 @@
 
 namespace ClarkeWing\Handoff;
 
+use ClarkeWing\Handoff\Http\Middleware\RedirectGuestToHandoffLogin;
 use ClarkeWing\Handoff\Http\Middleware\RedirectToHandoff;
+use ClarkeWing\Handoff\Http\Middleware\RememberHandoffIntended;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
@@ -41,8 +43,11 @@ class HandoffServiceProvider extends ServiceProvider
 
     protected function registerPackageMiddleware(): void
     {
-        $this->app->make(Router::class)
-            ->aliasMiddleware('handoff', RedirectToHandoff::class);
+        $router = $this->app->make(Router::class);
+
+        $router->aliasMiddleware('handoff', RedirectToHandoff::class);
+        $router->aliasMiddleware('handoff.login', RedirectGuestToHandoffLogin::class);
+        $router->aliasMiddleware('handoff.intended', RememberHandoffIntended::class);
     }
 
     protected function registerPackageConfig(): void

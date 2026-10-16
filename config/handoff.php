@@ -36,6 +36,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Login Path
+    |--------------------------------------------------------------------------
+    |
+    | The path of the login page on the target host. Guests of this app can be
+    | sent there (see the RedirectGuestToHandoffLogin middleware) carrying the
+    | path they were trying to reach, so that the target app can hand them
+    | back here once they have authenticated.
+    |
+    */
+
+    'login_path' => env('HANDOFF_LOGIN_PATH', '/login'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Route Mapping
     |--------------------------------------------------------------------------
     |

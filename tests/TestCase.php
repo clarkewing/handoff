@@ -39,6 +39,8 @@ abstract class TestCase extends Orchestra
             'prefix' => '',
         ]);
 
+        $app['config']->set('session.driver', 'array');
+
         $app['config']->set('handoff.auth.model', User::class);
     }
 

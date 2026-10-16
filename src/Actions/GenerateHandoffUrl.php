@@ -2,6 +2,7 @@
 
 namespace ClarkeWing\Handoff\Actions;
 
+use ClarkeWing\Handoff\HandoffIntended;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\URL;
 use RuntimeException;
@@ -35,6 +36,16 @@ class GenerateHandoffUrl
         );
 
         return $this->swapBaseUrl($signedUrl);
+    }
+
+    /**
+     * Generate a signed handoff URL to the path a guest was trying to reach on
+     * the origin app before being sent here to log in, consuming it from the
+     * session. Returns null when no such path was stored.
+     */
+    public function forIntended(Authenticatable $user, ?int $ttl = null): ?string
+    {
+        return app(HandoffIntended::class)->pullUrl($user, $ttl);
     }
 
     /**
