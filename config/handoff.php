@@ -36,6 +36,34 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Login Path
+    |--------------------------------------------------------------------------
+    |
+    | The path of the login page on the target host. Guests of this app can be
+    | sent there (see the RedirectGuestToHandoffLogin middleware) carrying the
+    | path they were trying to reach, so that the target app can hand them
+    | back here once they have authenticated.
+    |
+    */
+
+    'login_path' => env('HANDOFF_LOGIN_PATH', '/login'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Domain
+    |--------------------------------------------------------------------------
+    |
+    | The host on which this app's /handoff endpoint is served. Leave it null
+    | to register the endpoint without a domain constraint, so that it answers
+    | on every host the app serves. Set it when the app serves several hosts
+    | and the endpoint should only exist on one of them.
+    |
+    */
+
+    'domain' => env('HANDOFF_DOMAIN'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Route Mapping
     |--------------------------------------------------------------------------
     |

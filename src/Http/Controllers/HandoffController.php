@@ -2,6 +2,7 @@
 
 namespace ClarkeWing\Handoff\Http\Controllers;
 
+use ClarkeWing\Handoff\Support\InternalPath;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
@@ -65,13 +66,9 @@ class HandoffController
 
     protected function redirect(): RedirectResponse
     {
-        $target = $this->request->string('target', '/');
-
         // Only allow internal paths to avoid open redirect abuse.
-        if (! $target->startsWith('/')) {
-            $target = '/';
-        }
+        $target = InternalPath::sanitize($this->request->query('target')) ?? '/';
 
-        return response()->redirectTo((string) $target);
+        return response()->redirectTo($target);
     }
 }

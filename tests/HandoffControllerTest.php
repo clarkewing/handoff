@@ -103,6 +103,30 @@ it('sanitizes target paths to prevent open redirect vulnerabilities', function (
         ->assertRedirect('/');
 });
 
+it('sanitizes protocol-relative target paths to prevent open redirect vulnerabilities', function (string $target) {
+    $url = generateHandoffUrl(
+        user: $this->testUser->getAuthIdentifier(),
+        target: $target,
+    );
+
+    // Should redirect to root instead of the external host
+    $this->get($url)
+        ->assertRedirect('/');
+})->with([
+    'double slash' => '//malicious-site.com',
+    'backslash' => '/\\malicious-site.com',
+]);
+
+it('preserves the query string of an internal target path', function () {
+    $url = generateHandoffUrl(
+        user: $this->testUser->getAuthIdentifier(),
+        target: '/members/42?tab=flights',
+    );
+
+    $this->get($url)
+        ->assertRedirect('/members/42?tab=flights');
+});
+
 it('defaults to root path when target is not provided', function () {
     // Create a signed URL without a target parameter
     $url = generateHandoffUrl(

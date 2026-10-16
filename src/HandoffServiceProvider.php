@@ -2,14 +2,14 @@
 
 namespace ClarkeWing\Handoff;
 
+use ClarkeWing\Handoff\Http\Middleware\RedirectGuestToHandoffLogin;
 use ClarkeWing\Handoff\Http\Middleware\RedirectToHandoff;
+use ClarkeWing\Handoff\Http\Middleware\RememberHandoffIntended;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
-use Illuminate\Support\Stringable;
 
 class HandoffServiceProvider extends ServiceProvider
 {
@@ -27,8 +27,6 @@ class HandoffServiceProvider extends ServiceProvider
         $this->registerPackageMiddleware();
 
         $this->publishPackageConfig();
-
-        $this->bootPackageMacros();
     }
 
     protected function configurePackageRateLimiting(): void
@@ -45,8 +43,11 @@ class HandoffServiceProvider extends ServiceProvider
 
     protected function registerPackageMiddleware(): void
     {
-        $this->app->make(Router::class)
-            ->aliasMiddleware('handoff', RedirectToHandoff::class);
+        $router = $this->app->make(Router::class);
+
+        $router->aliasMiddleware('handoff', RedirectToHandoff::class);
+        $router->aliasMiddleware('handoff.login', RedirectGuestToHandoffLogin::class);
+        $router->aliasMiddleware('handoff.intended', RememberHandoffIntended::class);
     }
 
     protected function registerPackageConfig(): void
@@ -61,20 +62,5 @@ class HandoffServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../config/handoff.php' => config_path('handoff.php'),
         ], 'handoff-config');
-    }
-
-    protected function bootPackageMacros(): void
-    {
-        if ($this->laravelVersion() < 9) {
-            Request::macro('string', function (?string $key, mixed $default = null): Stringable {
-                /** @phpstan-ignore argument.type */
-                return Str::of($this->input($key, $default));
-            });
-        }
-    }
-
-    protected function laravelVersion(): int
-    {
-        return (int) Str::before(app()->version(), '.');
     }
 }
